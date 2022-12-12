@@ -1,0 +1,23 @@
+{% extends "base_menu.html" %}
+{% load humanize %} <!-- https://docs.djangoproject.com/en/3.0/ref/contrib/humanize -->
+{% block head %}
+<style>
+table, th, td {
+    padding: 2px 10px;
+}
+</style>
+{% endblock %}
+{% block content %}
+<h1>Group: {{ group.name }}</h1>
+{% if group.membership_set %}
+    members:
+    <ul>
+        {% for membership in group.membership_set.all %}
+            <li><a href="{% url 'dbmany:person_detail' membership.person.id %}"> {{ membership.person.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>{{ group.name }} has no members. </p>
+{% endif %}
+
+{% endblock %}

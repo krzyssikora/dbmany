@@ -1,0 +1,57 @@
+{% extends "base_menu.html" %}
+{% load humanize %} <!-- https://docs.djangoproject.com/en/3.0/ref/contrib/humanize -->
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'styles.css' %}">
+{% endblock %}
+{% block content %}
+{% if person_list %}
+    <h2>person(a)s:</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>nationality</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for person in person_list %}
+        <tr>
+            <td>{{person.id}}</td>
+            <td><a href="{% url 'dbmany:person_detail' person.id %}">{{person.name}}</a></td>
+            <td>{{person.nationality_str}}</td>
+            <td>
+                {% if person.owner == user %}
+                (<a href="{% url 'dbmany:person_update' person.id %}">Edit</a> |
+                <a href="{% url 'dbmany:person_delete' person.id %}">Delete</a>)
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No person in database</p>
+{% endif %}
+{% if group_list %}
+    <h2>groups:</h2>
+    <ul>
+        {% for group in group_list %}
+        <li><a href="{% url 'dbmany:group_detail' group.id %}">{{ group.name }}</a> </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No group in database</p>
+{% endif %}
+<p>
+<a href="{% url 'dbmany:person_create' %}">Add a Person</a> |
+<a href="{% url 'dbmany:group_create' %}">Add a Group</a> |
+{% if user.is_authenticated %}
+<a href="{% url 'logout' %}?next={% url 'dbmany:all' %}">Logout</a>
+{% else %}
+<a href="{% url 'login' %}?next={% url 'dbmany:all' %}">Login</a>
+{% endif %}
+</p>
+
+{% endblock %}
