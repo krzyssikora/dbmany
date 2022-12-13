@@ -24,6 +24,11 @@ class Group(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
+    members = models.ManyToManyField(
+        'Person',
+        through='Membership',
+        # through_fields=('group', 'person')
+    )
 
     def __str__(self):
         return self.name
@@ -44,10 +49,9 @@ class Person(models.Model):
         max_length=1000
     )
     groups = models.ManyToManyField(
-        Group,
+        'Group',
         through='Membership',
-        through_fields=('person', 'group'),
-        related_name='groups'
+        # through_fields=('group', 'person')
     )
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
@@ -70,11 +74,19 @@ class Person(models.Model):
 
 
 class Membership(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    group = models.ForeignKey(
+        'Group',
+        on_delete=models.CASCADE,
+        # related_name='Group'
+    )
+    person = models.ForeignKey(
+        'Person',
+        on_delete=models.CASCADE,
+        # related_name='Person'
+    )
     # inviter = models.ForeignKey(
     #     Person,
     #     on_delete=models.CASCADE,
     #     related_name="membership_invites",
     # )
-    # invite_reason = models.CharField(max_length=64)
+    invite_reason = models.CharField(max_length=64, default="")
