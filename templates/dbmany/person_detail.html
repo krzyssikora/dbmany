@@ -37,16 +37,22 @@
 <p>
     {{person.about}}
 </p>
+
 <div>
     {% if person.groups %}
         groups:
         <ul>
-            {% for group in person.groups.all %}
-            <li><a href="{% url 'dbmany:group_detail' group.id %}"> {{ group.name }}</a></li>
+            {% for membership in person.membership_set.all %}
+            <li>
+                <a href="{% url 'dbmany:group_detail' membership.group.id %}"> {{ membership.group.name }}</a>
+                ({{ membership.invite_reason }})
+            </li>
             {% endfor %}
+
         </ul>
     {% else %}
     <p>{{ person.name }} does not belong to any group. </p>
     {% endif %}
 </div>
+
 {% endblock %}

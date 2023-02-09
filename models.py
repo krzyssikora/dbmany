@@ -64,7 +64,6 @@ class Person(models.Model):
     # spoken_languages =
     # todo https://pypi.org/project/django-multiselectfield/
     #  simple idea, but CSV, so commas not allowed in options (?)
-    #  multichoice form: https://www.geeksforgeeks.org/multiplechoicefield-django-forms/
 
     def __str__(self):
         return self.name
@@ -89,4 +88,7 @@ class Membership(models.Model):
     #     on_delete=models.CASCADE,
     #     related_name="membership_invites",
     # )
-    invite_reason = models.CharField(max_length=64, default="")
+    invite_reason = models.CharField(max_length=64)
+
+    class Meta:
+        unique_together = [['person', 'group']]

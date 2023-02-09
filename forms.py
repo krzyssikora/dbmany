@@ -19,6 +19,7 @@ class CreatePersonForm(forms.ModelForm):
         queryset=Group.objects.all(),
         # empty_label=None
     )
+    # invite_reason = forms.CharField(required=False, max_length=64)
 
     class Meta:
         model = Person
@@ -49,13 +50,9 @@ class CreatePersonForm(forms.ModelForm):
             bytearr = f.read()
             instance.content_type = f.content_type
             instance.picture = bytearr  # Overwrite with the actual image data
-            print('picture uploaded')
 
         if commit:
             instance.save()
-            print('picture saved')
-
-        print(f'picture instance: {type(instance.picture)}')
 
         return instance
 

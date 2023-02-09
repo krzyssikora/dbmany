@@ -4,7 +4,7 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 
-from .models import Person, Group
+from .models import Person, Group, Membership
 from .owner import OwnerListView, OwnerDetailView,  OwnerDeleteView
 from .forms import CreatePersonForm, CreateGroupForm
 
@@ -41,6 +41,16 @@ class GroupListView(OwnerListView):
 
 class PersonDetailView(OwnerDetailView):
     model = Person
+    def get(self, request, *args, **kwargs):
+        person = get_object_or_404(Person, pk=kwargs['pk'])
+        groups_memberships = [
+            (group.id, person.membership_set.filter(group_id=group.id)) for group in person.groups.all()
+        ]
+        context = {
+            'groups_memberships': groups_memberships,
+            'person': person
+        }
+        return render(request, 'dbmany/person_detail.html', context)
 
 
 class GroupDetailView(OwnerDetailView):
@@ -72,6 +82,13 @@ class PersonCreateView(LoginRequiredMixin, View):
         person = form.save(commit=False)
         person.owner = self.request.user
         person.save()
+        groups = form.cleaned_data['groups']
+        for group in groups:
+            membership = Membership.objects.filter(group_id=group.id, person_id=person.id)[0]
+            membership.invite_reason = form.cleaned_data['invite_reason']
+            # add other fields here
+            membership.save()
+
         form.save_m2m()
         return redirect(self.success_url)
 
